@@ -22,7 +22,7 @@ func (rs *RangeSet) AddInts(nums []int64) {
         for j := 0; j < len(rs.Ranges); j++ {
             low := rs.Ranges[j].Low
             high := rs.Ranges[j].High
-            isLastLoop := len(rs.Ranges) - 1 === j
+            isLastLoop := len(rs.Ranges) - 1 == j
 
             if contains(rs.Ranges[j], num) {
                 break
@@ -39,15 +39,14 @@ func (rs *RangeSet) AddInts(nums []int64) {
                     nextRange := rs.Ranges[j + 1]
                     if nextRange.Low - 1 == num {
                         // closes a gap
-                        temp := append(rs.Ranges[:j], Range{low, nextRange.High});
-                        rs.Ranges = append(temp, rs.Ranges[j + 2:]...)
+                        rs.Ranges = splice(rs.Ranges, j, 2, Range{low, nextRange.High})
                     }
                 }
                 break
             }
 
             if num < low {
-                // rs.Ranges.splice(j, 0, Range{num, num})
+                rs.Ranges = splice(rs.Ranges, j, 0, Range{num, num})
                 break
             }
 
@@ -73,4 +72,9 @@ func (rs *RangeSet) RemoveRange(r *Range) {
 
 func contains(r Range, num int64) bool {
     return num >= r.Low && num <= r.High
+}
+
+func splice(ranges []Range, startIdx int, elCount int, toInsert Range) []Range {
+    temp := append(ranges[:startIdx], toInsert)
+    return append(temp, ranges[startIdx + elCount:]...)
 }
