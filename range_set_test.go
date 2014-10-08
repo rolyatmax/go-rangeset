@@ -15,5 +15,5 @@ func TestAdd(t *testing.T) {
     // nums := []int64{1, 2, 3, 6, 7, 8}
     nums := []int64{1}
     r.AddInts(nums)
-    fmt.Printf("r.Ranges: %s", r.Ranges)
+    fmt.Printf("r.Ranges: %d", r.Ranges)
 }
