@@ -11,9 +11,7 @@ type RangeSet struct {
 }
 
 func (rs *RangeSet) AddInts(nums []int64) {
-    for i := 0; i < len(nums); i++ {
-        num := nums[i]
-
+    for _, num := range nums {
         if len(rs.Ranges) == 0 {
             rs.Ranges = append(rs.Ranges, Range{num, num})
             continue
@@ -59,9 +57,7 @@ func (rs *RangeSet) AddInts(nums []int64) {
 }
 
 func (rs *RangeSet) RemoveInts(nums []int64) {
-    for i := 0; i < len(nums); i++ {
-        num := nums[i]
-
+    for _, num := range nums {
         for j := 0; j < len(rs.Ranges); j++ {
             if !contains(rs.Ranges[j], num) {
                 continue
