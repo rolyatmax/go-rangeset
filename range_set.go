@@ -17,12 +17,12 @@ func (rs *RangeSet) AddInts(nums []int64) {
             continue
         }
 
-        for j := 0; j < len(rs.Ranges); j++ {
-            low := rs.Ranges[j].Low
-            high := rs.Ranges[j].High
+        for j, curRange := range rs.Ranges {
+            low := curRange.Low
+            high := curRange.High
             isLastLoop := len(rs.Ranges) - 1 == j
 
-            if contains(rs.Ranges[j], num) {
+            if contains(curRange, num) {
                 break
             }
 
@@ -58,13 +58,13 @@ func (rs *RangeSet) AddInts(nums []int64) {
 
 func (rs *RangeSet) RemoveInts(nums []int64) {
     for _, num := range nums {
-        for j := 0; j < len(rs.Ranges); j++ {
-            if !contains(rs.Ranges[j], num) {
+        for j, curRange := range rs.Ranges {
+            if !contains(curRange, num) {
                 continue
             }
 
-            low := rs.Ranges[j].Low
-            high := rs.Ranges[j].High
+            low := curRange.Low
+            high := curRange.High
 
             if low == num && high == num {
                 rs.Ranges = remove(rs.Ranges, j, 1)
