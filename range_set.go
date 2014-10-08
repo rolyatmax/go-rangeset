@@ -1,10 +1,12 @@
 package range_set
 
+import (
+    "math"
+)
 
 type Range struct {
     Low, High int64
 }
-
 
 type RangeSet struct {
     Ranges []Range
@@ -81,13 +83,67 @@ func (rs *RangeSet) RemoveInts(nums []int64) {
     }
 }
 
-func (rs *RangeSet) AddRange(r *Range) {
+func (rs *RangeSet) AddRange(r Range) {
+    if r.Low > r.High {
+        // throw an error
+    }
 
+    if len(rs.Ranges) == 0 {
+        rs.Ranges = append(rs.Ranges, r)
+        return
+    }
+
+    var overlapStart int64
+    overlapStartIdx := -1
+    for i, curRange := range rs.Ranges {
+        // if the range comes before all the other ranges with no overlap
+        if (r.High < curRange.Low - 1) {
+            rs.Ranges = splice(rs.Ranges, i, 0, r)
+            return
+        }
+
+        if overlapStartIdx == -1 && hasOverlap(curRange, r) {
+            overlapStartIdx = i
+            overlapStart = curRange.Low
+        }
+
+        isLastLoop := len(rs.Ranges) - 1 == i
+        if overlapStartIdx == -1 && isLastLoop {
+            // last loop and no overlapStart found
+            // it must come after all the other ranges
+            rs.Ranges = append(rs.Ranges, r)
+            return
+        }
+
+        isLastOverlap := isLastLoop || hasOverlap(r, rs.Ranges[i + 1])
+        if overlapStartIdx != -1 && isLastOverlap {
+            // curRange is the last overlapping range
+            low := math.Min(float64(overlapStart), float64(r.Low))
+            high := math.Max(float64(curRange.High), float64(r.High))
+            overlappingRangeCount := i - overlapStartIdx + 1
+            newRange := Range{int64(low), int64(high)}
+            rs.Ranges = splice(rs.Ranges, overlapStartIdx, overlappingRangeCount, newRange)
+            return
+        }
+    }
 }
 
 func (rs *RangeSet) RemoveRange(r *Range) {
-
+    if r.Low > r.High {
+        // throw an error
+    }
 }
+
+func (rs *RangeSet) contains(num int64) bool {
+    for _, curRange := range rs.Ranges {
+        if contains(curRange, num) {
+            return true
+        }
+    }
+    return false
+}
+
+// helpers
 
 func contains(r Range, num int64) bool {
     return num >= r.Low && num <= r.High
@@ -100,4 +156,16 @@ func splice(ranges []Range, startIdx int, elCount int, toInsert Range) []Range {
 
 func remove(ranges []Range, startIdx int, elCount int) []Range {
     return append(ranges[:startIdx], ranges[startIdx + elCount:]...)
+}
+
+func hasOverlap(rangeOne, rangeTwo Range) bool {
+    var lowest, highest Range
+    if rangeOne.Low <= rangeTwo.Low {
+        lowest = rangeOne
+        highest = rangeTwo
+    } else {
+        lowest = rangeTwo
+        highest = rangeOne
+    }
+    return lowest.High >= highest.Low - 1
 }
