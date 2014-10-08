@@ -132,6 +132,12 @@ func (rs *RangeSet) RemoveRange(r *Range) {
     if r.Low > r.High {
         // throw an error
     }
+
+    var rangesToRemove []int
+    for i, curRange := range rs.Ranges {
+
+    }
+    // if rangesToRemove
 }
 
 func (rs *RangeSet) contains(num int64) bool {
