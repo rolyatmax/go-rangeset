@@ -79,3 +79,88 @@ func TestAddRemoveInts(t *testing.T) {
         t.Errorf("Expected 1-1, 4-8")
     }
 }
+
+func TestAddRemoveRanges(t *testing.T) {
+    fmt.Printf("------------------\n")
+
+    r := RangeSet{}
+    if len(r.Ranges) != 0 {
+        t.Errorf("Length of Ranges is not 0")
+    }
+
+
+    r.AddRange(Range{10, 100})
+    fmt.Printf("r.Ranges: %d \n", r.Ranges)
+
+    if r.Ranges[0].Low != 10 || r.Ranges[0].High != 100 {
+        t.Errorf("Expected 10-100")
+    }
+
+
+    r.AddRange(Range{130, 132})
+    fmt.Printf("added 130-132: %d \n", r.Ranges)
+
+    if r.Ranges[1].Low != 130 || r.Ranges[1].High != 132 {
+        t.Errorf("Expected 10-100, 130-132")
+    }
+
+
+    r.AddRange(Range{101, 129})
+    fmt.Printf("added 101-129: %d \n", r.Ranges)
+
+    if r.Ranges[0].Low != 10 || r.Ranges[0].High != 132 {
+        t.Errorf("Expected 10-132")
+    }
+
+
+    r.RemoveRange(Range{12, 22})
+    fmt.Printf("removed 12-22: %d \n", r.Ranges)
+
+    if r.Ranges[0].Low != 10 || r.Ranges[0].High != 11 {
+        t.Errorf("Expected 10-11, 23-132")
+    }
+
+
+    r.AddRange(Range{5, 20})
+    fmt.Printf("added 5-20: %d \n", r.Ranges)
+
+    if r.Ranges[0].Low != 5 || r.Ranges[0].High != 20 {
+        t.Errorf("Expected 5-20, 23-132")
+    }
+
+
+    r.AddRange(Range{4, 1000})
+    fmt.Printf("added 4-1000: %d \n", r.Ranges)
+
+    if r.Ranges[0].Low != 4 || r.Ranges[0].High != 1000 {
+        t.Errorf("Expected 4-1000")
+    }
+
+
+    r.RemoveRange(Range{400, 500})
+    fmt.Printf("removed 400-500: %d \n", r.Ranges)
+
+    if r.Ranges[0].Low != 4 || r.Ranges[0].High != 399 {
+        t.Errorf("Expected 4-399, 501-1000")
+    }
+    if r.Ranges[1].Low != 501 || r.Ranges[1].High != 1000 {
+        t.Errorf("Expected 4-399, 501-1000")
+    }
+
+    r.RemoveRange(Range{505, 2000})
+    fmt.Printf("removed 505-2000: %d \n", r.Ranges)
+
+    if r.Ranges[1].Low != 501 && r.Ranges[1].High != 504 {
+        t.Errorf("Expected 4-399, 501-504")
+    }
+
+    r.AddRange(Range{410, 420})
+    fmt.Printf("added 410-420: %d \n", r.Ranges)
+
+    if r.Ranges[1].Low != 410 || r.Ranges[1].High != 420 {
+        t.Errorf("Expected 4-399, 410-420, 501-504")
+    }
+    if r.Ranges[2].Low != 501 || r.Ranges[2].High != 504 {
+        t.Errorf("Expected 4-399, 410-420, 501-504")
+    }
+}

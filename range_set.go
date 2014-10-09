@@ -97,7 +97,7 @@ func (rs *RangeSet) AddRange(r Range) {
     overlapStartIdx := -1
     for i, curRange := range rs.Ranges {
         // if the range comes before all the other ranges with no overlap
-        if (r.High < curRange.Low - 1) {
+        if r.High < curRange.Low - 1 {
             rs.Ranges = splice(rs.Ranges, i, 0, r)
             return
         }
@@ -115,7 +115,7 @@ func (rs *RangeSet) AddRange(r Range) {
             return
         }
 
-        isLastOverlap := isLastLoop || hasOverlap(r, rs.Ranges[i + 1])
+        isLastOverlap := isLastLoop || !hasOverlap(r, rs.Ranges[i + 1])
         if overlapStartIdx != -1 && isLastOverlap {
             // curRange is the last overlapping range
             low := math.Min(float64(overlapStart), float64(r.Low))
@@ -128,7 +128,7 @@ func (rs *RangeSet) AddRange(r Range) {
     }
 }
 
-func (rs *RangeSet) RemoveRange(r *Range) {
+func (rs *RangeSet) RemoveRange(r Range) {
     if r.Low > r.High {
         // throw an error
     }
@@ -138,9 +138,11 @@ func (rs *RangeSet) RemoveRange(r *Range) {
         if r.High < curRange.Low {
             break
         }
+
         if r.Low > curRange.High {
             continue
         }
+
         if r.Low <= curRange.Low {
             if r.High < curRange.High {
                 rs.Ranges[i].Low = r.High + 1
@@ -178,7 +180,9 @@ func contains(r Range, num int64) bool {
 }
 
 func splice(ranges []Range, startIdx int, elCount int, toInsert Range) []Range {
-    temp := append(ranges[:startIdx], toInsert)
+    temp := make([]Range, startIdx)
+    copy(temp, ranges)
+    temp = append(temp, toInsert)
     return append(temp, ranges[startIdx + elCount:]...)
 }
 
