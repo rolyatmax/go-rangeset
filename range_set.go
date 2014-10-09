@@ -135,9 +135,31 @@ func (rs *RangeSet) RemoveRange(r *Range) {
 
     var rangesToRemove []int
     for i, curRange := range rs.Ranges {
-
+        if r.High < curRange.Low {
+            break
+        }
+        if r.Low > curRange.High {
+            continue
+        }
+        if r.Low <= curRange.Low {
+            if r.High < curRange.High {
+                rs.Ranges[i].Low = r.High + 1
+            } else {
+                rangesToRemove = append(rangesToRemove, i)
+            }
+        } else {
+            if r.High >= curRange.High {
+                rs.Ranges[i].High = r.Low - 1
+            } else {
+                rs.Ranges = splice(rs.Ranges, i, 1, Range{curRange.Low, r.Low - 1})
+                rs.Ranges = splice(rs.Ranges, i + 1, 0, Range{r.High + 1, curRange.High})
+                return
+            }
+        }
     }
-    // if rangesToRemove
+    if len(rangesToRemove) != 0 {
+        rs.Ranges = remove(rs.Ranges, rangesToRemove[0], len(rangesToRemove))
+    }
 }
 
 func (rs *RangeSet) contains(num int64) bool {
